@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我们的团队</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="text-center mb-4">小组成员展示</h1>
+
+        <!-- 搜索和筛选 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <input type="text" id="searchInput" class="form-control" placeholder="搜索姓名、角色或技能...">
+            </div>
+            <div class="col-md-6">
+                <select id="roleFilter" class="form-select">
+                    <option value="">全部角色</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 成员卡片将在这里动态生成 -->
+        <div class="row" id="memberGrid"></div>
+
+        <!-- 评论区占位，稍后替换为 Giscus 代码 -->
+        <hr class="my-5">
+        <h2 class="mb-3">留言区</h2>
+        <div id="comments">
+            <p class="text-muted">评论区加载中...</p>
+        </div>
+    </div>
+
+    <script>
+        // ================= 成员信息（只需要修改这里） =================
+        const members = [
+            {
+                name: "张三",
+                role: "组长",
+                bio: "负责整体统筹和进度管理",
+                skills: ["Python", "项目管理"],
+                avatar: "https://via.placeholder.com/300x200?text=张三",
+                github: "https://github.com/zhangsan"
+            },
+            {
+                name: "李四",
+                role: "组员",
+                bio: "负责前端开发和界面设计",
+                skills: ["JavaScript", "React"],
+                avatar: "https://via.placeholder.com/300x200?text=李四",
+                github: "https://github.com/lisi"
+            },
+            {
+                name: "王五",
+                role: "组员",
+                bio: "负责后端接口和数据库",
+                skills: ["Java", "MySQL"],
+                avatar: "https://via.placeholder.com/300x200?text=王五",
+                github: "https://github.com/wangwu"
+            }
+            // 继续添加成员，复制上面的格式即可
+        ];
+
+        // ================= 下面的代码不用动 =================
+        function renderMembers(filteredMembers) {
+            const grid = document.getElementById('memberGrid');
+            grid.innerHTML = '';
+            filteredMembers.forEach(member => {
+                const skills = member.skills.map(s => `<span class="badge bg-secondary me-1">${s}</span>`).join('');
+                const card = `
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <img src="${member.avatar}" class="card-img-top" alt="${member.name}">
+                            <div class="card-body">
+                                <h5 class="card-title">${member.name}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">${member.role}</h6>
+                                <p class="card-text">${member.bio}</p>
+                                <div class="mb-2">${skills}</div>
+                                ${member.github ? `<a href="${member.github}" target="_blank" class="btn btn-sm btn-outline-primary">GitHub</a>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', card);
+            });
+        }
+
+        function populateRoleFilter() {
+            const roles = [...new Set(members.map(m => m.role))];
+            const select = document.getElementById('roleFilter');
+            roles.forEach(role => {
+                const option = document.createElement('option');
+                option.value = role;
+                option.textContent = role;
+                select.appendChild(option);
+            });
+        }
+
+        function filterMembers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedRole = document.getElementById('roleFilter').value;
+            const filtered = members.filter(m => {
+                const matchSearch = m.name.toLowerCase().includes(searchTerm) ||
+                                    m.role.toLowerCase().includes(searchTerm) ||
+                                    m.skills.join(' ').toLowerCase().includes(searchTerm);
+                const matchRole = selectedRole === '' || m.role === selectedRole;
+                return matchSearch && matchRole;
+            });
+            renderMembers(filtered);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            populateRoleFilter();
+            renderMembers(members);
+            document.getElementById('searchInput').addEventListener('input', filterMembers);
+            document.getElementById('roleFilter').addEventListener('change', filterMembers);
+        });
+    </script>
+</body>
+</html>
